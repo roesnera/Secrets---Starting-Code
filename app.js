@@ -1,7 +1,9 @@
+require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const ejs = require('ejs');
 const mongoose = require('mongoose');
+const encrypt = require('mongoose-encryption');
 
 const app = express();
 app.use(express.static('public'));
@@ -20,6 +22,13 @@ const userSchema = mongoose.Schema({
         type: String
     }
 });
+
+
+// USERDBKEY set in .env file and compiled into environment variables using dotenv package
+const secret = process.env.USERDBKEY;
+userSchema.plugin(encrypt, { secret: secret, encryptedFields: ["password"] })
+
+// console.log(process.env.USERDBKEY)
 
 const User = mongoose.model("User", userSchema);
 
@@ -47,7 +56,7 @@ app.post('/login', function(req, res){
             }
         }
     });
-    res.render('login');
+    // res.render('login');
 })
 
 app.get('/register', function(req, res){
